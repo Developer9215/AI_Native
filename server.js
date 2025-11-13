@@ -4,7 +4,7 @@ const OpenAI = require('openai');
 require('dotenv').config();
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // 전역 상태 관리
 let currentStatus = 'online';
@@ -12,6 +12,8 @@ let currentStatus = 'online';
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// ⚠️ 이 줄 삭제 (Vercel에서는 static 서빙을 vercel.json으로)
 // app.use(express.static('public'));
 
 // OpenAI 클라이언트 초기화
@@ -189,8 +191,12 @@ app.post('/agent', async (req, res) => {
   }
 });
 
+// ⚠️ 로컬에서만 listen (Vercel에서는 실행 안 됨)
 if (process.env.NODE_ENV !== 'production') {
   app.listen(port, () => {
     console.log(`서버가 http://localhost:${port} 에서 실행 중입니다.`);
   });
 }
+
+// ⚠️ Vercel serverless를 위한 export (필수!)
+module.exports = app;
