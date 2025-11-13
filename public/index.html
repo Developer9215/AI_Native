@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Native Backend Demo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- 사이드바 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1>AI Native Backend</h1>
+        <span class="version">v1.0</span>
+      </div>
+      
+      <div class="user-profile">
+        <div class="avatar">DEV</div>
+        <div class="user-info">
+          <div class="user-name">Developer</div>
+          <div id="sidebarStatus" class="user-status online">온라인</div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="#demo1" class="nav-item active" data-target="demo1">
+          <span class="nav-icon">📊</span>
+          <span class="nav-text">감정 분석</span>
+        </a>
+        <a href="#demo2" class="nav-item" data-target="demo2">
+          <span class="nav-icon">🔄</span>
+          <span class="nav-text">상태 관리</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="tech-stack">
+          <span class="tech-badge">Node.js</span>
+          <span class="tech-badge">OpenAI</span>
+          <span class="tech-badge">Express</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+      <!-- Demo 1: 감정 분석 -->
+      <section id="demo1" class="demo-panel active">
+        <div class="panel-header">
+          <div>
+            <h2>감정 분석 AI</h2>
+            <p class="panel-subtitle">Backend → AI 호출 패턴</p>
+          </div>
+          <span class="status-indicator">● LIVE</span>
+        </div>
+
+        <div class="split-view">
+          <!-- 왼쪽: 프로필 UI -->
+          <div class="split-left">
+            <div class="profile-container">
+              <!-- 프로필 카드 -->
+              <div class="profile-card">
+                <div class="profile-avatar-large">
+                  <div class="avatar-circle">DEV</div>
+                </div>
+                
+                <div class="profile-info">
+                  <h3 class="profile-name">Developer</h3>
+                  <div class="profile-email">dev@ai-backend.local</div>
+                </div>
+
+                <!-- 상태 메시지 입력 영역 -->
+                <div class="status-message-section">
+                  <label class="section-label">상태 메시지</label>
+                  <div class="status-message-input-wrapper">
+                    <input 
+                      type="text" 
+                      id="moodMessage" 
+                      placeholder="나의 상태를 입력하세요..."
+                      class="status-message-input"
+                      maxlength="50"
+                    />
+                    <button id="analyzeMoodBtn" class="analyze-btn">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 11L12 14L22 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M21 12V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      분석하기
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 감정 분석 결과 -->
+                <div id="moodResultSection" class="mood-result-section hidden">
+                  <label class="section-label">감정 분석 결과</label>
+                  <div class="mood-result-card">
+                    <div class="mood-icon" id="moodIcon">😊</div>
+                    <div class="mood-details">
+                      <div class="mood-label" id="moodLabel">긍정적</div>
+                      <div class="mood-description" id="moodDescription">밝고 긍정적인 감정이 느껴집니다</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 프로필 액션 버튼들 -->
+                <div class="profile-actions">
+                  <button class="profile-action-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                      <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>채팅</span>
+                  </button>
+                  <button class="profile-action-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                      <path d="M3 8L10.89 13.26C11.2187 13.4793 11.6049 13.5963 12 13.5963C12.3951 13.5963 12.7813 13.4793 13.11 13.26L21 8M5 19H19C19.5304 19 20.0391 18.7893 20.4142 18.4142C20.7893 18.0391 21 17.5304 21 17V7C21 6.46957 20.7893 5.96086 20.4142 5.58579C20.0391 5.21071 19.5304 5 19 5H5C4.46957 5 3.96086 5.21071 3.58579 5.58579C3.21071 5.96086 3 6.46957 3 7V17C3 17.5304 3.21071 18.0391 3.58579 18.4142C3.96086 18.7893 4.46957 19 5 19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>메시지</span>
+                  </button>
+                </div>
+
+                <!-- 로딩 상태 -->
+                <div id="moodLoading" class="profile-loading hidden">
+                  <div class="loading-spinner"></div>
+                  <p>AI가 감정을 분석하고 있습니다...</p>
+                </div>
+              </div>
+
+              <!-- 프로필 설명 -->
+              <div class="profile-description">
+                <div class="description-card">
+                  <h4>💡 시연 설명</h4>
+                  <p>상태 메시지를 입력하면 백엔드가 OpenAI API를 호출하여 감정을 분석합니다.</p>
+                  <div class="tech-flow">
+                    <span class="flow-item">사용자 입력</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="flow-item">Backend</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="flow-item">AI 분석</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="flow-item">결과 표시</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 오른쪽: API 로그 뷰어 -->
+          <div class="split-right">
+            <div class="api-viewer">
+              <div class="api-viewer-header">
+                <h3>API 호출 로그</h3>
+                <button id="clearMoodLog" class="clear-btn">Clear</button>
+              </div>
+              <div id="moodApiLog" class="api-log-content">
+                <div class="log-placeholder">
+                  API 요청/응답이 여기에 표시됩니다
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Demo 2: 상태 관리 -->
+      <section id="demo2" class="demo-panel">
+        <div class="panel-header">
+          <div>
+            <h2>상태 관리 시스템</h2>
+            <p class="panel-subtitle">AI ↔ Backend 상호작용</p>
+          </div>
+          <span class="status-indicator">● LIVE</span>
+        </div>
+
+        <div class="split-view">
+          <!-- 왼쪽: 상태 관리 UI -->
+          <div class="split-left">
+            <div class="status-management">
+              <!-- 현재 상태 표시 -->
+              <div class="current-status-card">
+                <div class="card-label">현재 상태</div>
+                <div id="currentStatus" class="status-display online">
+                  <span class="status-dot"></span>
+                  <span class="status-text">온라인</span>
+                </div>
+              </div>
+
+              <!-- 수동 상태 변경 -->
+              <div class="control-section">
+                <h3 class="section-title">수동 제어</h3>
+                <div class="status-buttons">
+                  <button class="status-btn online-btn" data-status="online">
+                    <span class="btn-icon">🟢</span>
+                    <span>온라인</span>
+                  </button>
+                  <button class="status-btn offline-btn" data-status="offline">
+                    <span class="btn-icon">⚫</span>
+                    <span>오프라인</span>
+                  </button>
+                  <button class="status-btn meeting-btn" data-status="meeting">
+                    <span class="btn-icon">🔴</span>
+                    <span>회의 중</span>
+                  </button>
+                  <button class="status-btn vacation-btn" data-status="vacation">
+                    <span class="btn-icon">🏖️</span>
+                    <span>휴가 중</span>
+                  </button>
+                  <button class="status-btn lunch-btn" data-status="lunch">
+                    <span class="btn-icon">🍽️</span>
+                    <span>점심시간</span>
+                  </button>
+                  <button class="status-btn remote-btn" data-status="remote">
+                    <span class="btn-icon">🏠</span>
+                    <span>재택근무</span>
+                  </button>
+                  <button class="status-btn dnd-btn" data-status="dnd">
+                    <span class="btn-icon">🔕</span>
+                    <span>방해금지</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- AI Agent 상태 변경 -->
+              <div class="control-section">
+                <h3 class="section-title">AI Agent 제어</h3>
+                
+                <div class="chat-container compact">
+                  <div id="agentChatMessages" class="chat-messages">
+                    <div class="system-message">
+                      자연어로 상태 변경을 요청하세요
+                    </div>
+                  </div>
+
+                  <div class="chat-input-container">
+                    <input 
+                      type="text" 
+                      id="agentCommand" 
+                      placeholder="예: 회의 중으로 바꿔줘"
+                      class="chat-input"
+                    />
+                    <button id="agentRequestBtn" class="send-btn ai-btn">
+                      <span>AI 요청</span>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 오른쪽: API 로그 뷰어 -->
+          <div class="split-right">
+            <div class="api-viewer">
+              <div class="api-viewer-header">
+                <h3>API 호출 로그</h3>
+                <button id="clearAgentLog" class="clear-btn">Clear</button>
+              </div>
+              <div id="agentApiLog" class="api-log-content">
+                <div class="log-placeholder">
+                  API 요청/응답이 여기에 표시됩니다
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
