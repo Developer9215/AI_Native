@@ -12,7 +12,7 @@ let currentStatus = 'online';
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
+// app.use(express.static('public'));
 
 // OpenAI 클라이언트 초기화
 const openai = new OpenAI({
