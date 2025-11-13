@@ -1,5 +1,7 @@
 // API 기본 URL
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = window.location.hostname === 'localhost' 
+  ? 'http://localhost:3000'  // 로컬 개발
+  : '';  // Vercel 배포 (같은 도메인)
 
 // DOM 요소
 const moodMessageInput = document.getElementById('moodMessage');
