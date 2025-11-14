@@ -1,5 +1,7 @@
-// API 기본 URL
-const API_BASE_URL = 'http://localhost:3000';
+// API 기본 URL (환경에 따라 동적 설정)
+const API_BASE_URL = window.location.hostname === 'localhost' 
+  ? 'http://localhost:3000' 
+  : '';
 
 // DOM 요소
 const moodMessageInput = document.getElementById('moodMessage');
