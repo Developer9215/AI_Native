@@ -1,7 +1,5 @@
 // API 기본 URL
-const API_BASE_URL = window.location.hostname === 'localhost' 
-  ? 'http://localhost:3000'  // 로컬 개발
-  : '';  // Vercel 배포 (같은 도메인)
+const API_BASE_URL = 'http://localhost:3000';
 
 // DOM 요소
 const moodMessageInput = document.getElementById('moodMessage');
@@ -30,8 +28,8 @@ const clearAgentLogBtn = document.getElementById('clearAgentLog');
 const navItems = document.querySelectorAll('.nav-item');
 const demoPanels = document.querySelectorAll('.demo-panel');
 
-// API 로그 추가 함수
-function addApiLog(container, method, endpoint, requestData, responseData, isSuccess = true) {
+// API 로그 추가 함수 (단계별 프로세스 표시)
+function addApiLog(container, logData) {
   // placeholder 제거
   const placeholder = container.querySelector('.log-placeholder');
   if (placeholder) {
@@ -47,37 +45,131 @@ function addApiLog(container, method, endpoint, requestData, responseData, isSuc
   const logItem = document.createElement('div');
   logItem.className = 'api-log-item';
 
-  const requestJson = JSON.stringify(requestData, null, 2);
-  const responseJson = JSON.stringify(responseData, null, 2);
+  let stepsHTML = '';
 
-  logItem.innerHTML = `
-    <div class="log-timestamp">${timestamp}</div>
-    
-    <div class="log-section">
-      <div class="log-section-header">
-        <span class="log-method ${method.toLowerCase()}">${method} ${endpoint}</span>
-        <button class="copy-btn" onclick="copyToClipboard(\`${requestJson.replace(/`/g, '\\`')}\`)">Copy</button>
+  // 1. User Request
+  stepsHTML += `
+    <div class="log-step">
+      <div class="log-step-header">
+        <span class="step-number">1</span>
+        <span class="step-title">📤 User Request</span>
       </div>
-      <div class="log-section-body">
-        <pre class="log-code">${syntaxHighlight(requestJson)}</pre>
-      </div>
-    </div>
-
-    <div class="log-section">
-      <div class="log-section-header">
-        <span>Response <span class="log-status ${isSuccess ? 'success' : 'error'}">${isSuccess ? '200 OK' : 'ERROR'}</span></span>
-        <button class="copy-btn" onclick="copyToClipboard(\`${responseJson.replace(/`/g, '\\`')}\`)">Copy</button>
-      </div>
-      <div class="log-section-body">
-        <pre class="log-code">${syntaxHighlight(responseJson)}</pre>
+      <div class="log-step-body">
+        <pre class="log-code">${syntaxHighlight(JSON.stringify(logData.request, null, 2))}</pre>
       </div>
     </div>
   `;
 
+  // 2. AI Processing (있는 경우)
+  if (logData.aiPrompts) {
+    stepsHTML += `
+      <div class="log-step ai-step">
+        <div class="log-step-header">
+          <span class="step-number">2</span>
+          <span class="step-title">⬇️ AI Processing</span>
+        </div>
+      </div>
+    `;
+
+    // System Prompt
+    if (logData.aiPrompts.system) {
+      stepsHTML += `
+        <div class="log-substep">
+          <div class="log-substep-header">
+            <span class="substep-icon">🤖</span>
+            <span class="substep-title">AI System Prompt</span>
+            <button class="copy-btn-small" onclick="copyToClipboard(\`${logData.aiPrompts.system.replace(/`/g, '\\`')}\`)">Copy</button>
+          </div>
+          <div class="log-substep-body">
+            <pre class="log-code prompt-text">${escapeHtml(logData.aiPrompts.system)}</pre>
+          </div>
+        </div>
+      `;
+    }
+
+    // User Prompt
+    if (logData.aiPrompts.user) {
+      stepsHTML += `
+        <div class="log-substep">
+          <div class="log-substep-header">
+            <span class="substep-icon">🤖</span>
+            <span class="substep-title">AI User Prompt</span>
+            <button class="copy-btn-small" onclick="copyToClipboard(\`${logData.aiPrompts.user.replace(/`/g, '\\`')}\`)">Copy</button>
+          </div>
+          <div class="log-substep-body">
+            <pre class="log-code prompt-text">${escapeHtml(logData.aiPrompts.user)}</pre>
+          </div>
+        </div>
+      `;
+    }
+
+    // AI Generated Output
+    if (logData.aiGenerated) {
+      stepsHTML += `
+        <div class="log-step">
+          <div class="log-step-header">
+            <span class="step-number">3</span>
+            <span class="step-title">✨ AI Generated Output</span>
+          </div>
+          <div class="log-step-body">
+            <pre class="log-code">${syntaxHighlight(JSON.stringify(logData.aiGenerated, null, 2))}</pre>
+          </div>
+        </div>
+      `;
+    }
+
+    // Backend Processing
+    if (logData.backendProcessing) {
+      stepsHTML += `
+        <div class="log-step">
+          <div class="log-step-header">
+            <span class="step-number">4</span>
+            <span class="step-title">⚙️ Backend Processing</span>
+          </div>
+          <div class="log-step-body">
+            <pre class="log-code processing-text">${escapeHtml(logData.backendProcessing)}</pre>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  // Final Response
+  const finalStepNumber = logData.aiPrompts ? (logData.backendProcessing ? '5' : '4') : '2';
+  const statusClass = logData.response.success ? 'success' : 'error';
+  const statusText = logData.response.success ? '200 OK' : 'ERROR';
+
+  stepsHTML += `
+    <div class="log-step">
+      <div class="log-step-header">
+        <span class="step-number">${finalStepNumber}</span>
+        <span class="step-title">📥 Final Response</span>
+        <span class="log-status ${statusClass}">${statusText}</span>
+      </div>
+      <div class="log-step-body">
+        <pre class="log-code">${syntaxHighlight(JSON.stringify(logData.response, null, 2))}</pre>
+      </div>
+    </div>
+  `;
+
+  logItem.innerHTML = `
+    <div class="log-timestamp">${timestamp}</div>
+    <div class="log-endpoint">
+      <span class="log-method post">POST</span>
+      <span class="log-path">${logData.endpoint}</span>
+    </div>
+    ${stepsHTML}
+  `;
+
   container.insertBefore(logItem, container.firstChild);
-  
-  // 스크롤을 최상단으로
   container.scrollTop = 0;
+}
+
+// HTML 이스케이프 함수
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
 
 // JSON Syntax Highlighting
@@ -203,8 +295,20 @@ analyzeMoodBtn.addEventListener('click', async () => {
 
     const data = await response.json();
 
-    // API 로그 추가
-    addApiLog(moodApiLog, 'POST', '/analyze-mood', requestData, data, data.success);
+    // API 로그 추가 (단계별 프로세스)
+    addApiLog(moodApiLog, {
+      endpoint: '/analyze-mood',
+      request: requestData,
+      aiPrompts: {
+        system: '당신은 사용자의 상태 메시지를 보고 감정을 추측하는 전문가입니다. 상태 메시지를 읽고 이 사람이 현재 느끼는 감정을 positive, negative, neutral 중 하나로 분류하세요.',
+        user: `사용자의 상태 메시지를 보고 이 사람이 현재 느끼는 감정을 'positive', 'negative', 'neutral' 중 하나로만 JSON 형식으로 출력하세요.\n\n상태 메시지: "${message}"\n\n응답 형식: {"sentiment": "positive"}`
+      },
+      aiGenerated: {
+        sentiment: data.sentiment
+      },
+      backendProcessing: `AI 응답을 분석하여 감정 분류:\n- Sentiment: ${data.sentiment}\n- Analysis 객체 생성 (positive/negative/neutral 플래그)`,
+      response: data
+    });
 
     if (data.success) {
       // 감정별 아이콘, 라벨, 설명 설정
@@ -242,7 +346,14 @@ analyzeMoodBtn.addEventListener('click', async () => {
     console.error('감정 분석 오류:', error);
     
     // 에러 로그 추가
-    addApiLog(moodApiLog, 'POST', '/analyze-mood', requestData, { error: error.message }, false);
+    addApiLog(moodApiLog, {
+      endpoint: '/analyze-mood',
+      request: requestData,
+      response: { 
+        success: false, 
+        error: error.message 
+      }
+    });
     
     showToast('✗ 서버와 통신 중 오류가 발생했습니다', 'error');
   } finally {
@@ -332,8 +443,13 @@ statusButtons.forEach(button => {
 
       const data = await response.json();
 
-      // API 로그 추가
-      addApiLog(agentApiLog, 'POST', '/set-status', requestData, data, data.success);
+      // API 로그 추가 (전통적인 방식)
+      addApiLog(agentApiLog, {
+        endpoint: '/set-status',
+        request: requestData,
+        backendProcessing: `직접 상태 변경 실행:\ncurrentStatus = "${status}"`,
+        response: data
+      });
 
       if (data.success) {
         updateStatusUI(data.status);
@@ -345,7 +461,14 @@ statusButtons.forEach(button => {
       console.error('상태 변경 오류:', error);
       
       // 에러 로그 추가
-      addApiLog(agentApiLog, 'POST', '/set-status', requestData, { error: error.message }, false);
+      addApiLog(agentApiLog, {
+        endpoint: '/set-status',
+        request: requestData,
+        response: { 
+          success: false, 
+          error: error.message 
+        }
+      });
       
       showToast('✗ 서버와 통신 중 오류가 발생했습니다', 'error');
     } finally {
@@ -372,6 +495,15 @@ agentRequestBtn.addEventListener('click', async () => {
 
   const requestData = { command };
 
+  const toolDefinitions = `사용 가능한 툴:
+- setStatus_Online: 사용자를 온라인 상태로 변경
+- setStatus_Offline: 사용자를 오프라인 상태로 변경
+- setStatus_Meeting: 사용자를 회의 중 상태로 변경  
+- setStatus_Vacation: 사용자를 휴가 중 상태로 변경
+- setStatus_Lunch: 사용자를 점심시간/식사 중 상태로 변경
+- setStatus_Remote: 사용자를 재택근무 상태로 변경
+- setStatus_DND: 사용자를 방해금지 상태로 변경`;
+
   try {
     const response = await fetch(`${API_BASE_URL}/agent`, {
       method: 'POST',
@@ -384,8 +516,21 @@ agentRequestBtn.addEventListener('click', async () => {
     const data = await response.json();
     loadingEl.remove();
 
-    // API 로그 추가
-    addApiLog(agentApiLog, 'POST', '/agent', requestData, data, data.success);
+    // API 로그 추가 (AI Agent 프로세스)
+    addApiLog(agentApiLog, {
+      endpoint: '/agent',
+      request: requestData,
+      aiPrompts: {
+        system: `당신은 사용자의 명령을 분석하여 적절한 상태 변경 툴을 선택하는 AI Agent입니다.\n\n${toolDefinitions}\n\n사용자의 자연어 명령을 분석하여 가장 적절한 툴을 선택하세요.`,
+        user: `다음 명령에 가장 적합한 툴을 선택하세요:\n\n"${command}"`
+      },
+      aiGenerated: {
+        tool: data.selectedTool,
+        reasoning: data.reasoning
+      },
+      backendProcessing: `AI가 선택한 툴 실행:\n- Selected Tool: ${data.selectedTool}\n- Mapped Status: ${data.status}\n- Execute: currentStatus = "${data.status}"`,
+      response: data
+    });
 
     if (data.success) {
       updateStatusUI(data.status);
@@ -435,7 +580,14 @@ agentRequestBtn.addEventListener('click', async () => {
     console.error('AI Agent 오류:', error);
     
     // 에러 로그 추가
-    addApiLog(agentApiLog, 'POST', '/agent', requestData, { error: error.message }, false);
+    addApiLog(agentApiLog, {
+      endpoint: '/agent',
+      request: requestData,
+      response: { 
+        success: false, 
+        error: error.message 
+      }
+    });
     
     addMessage(agentChatMessages, 'ai', '❌ 서버와 통신 중 오류가 발생했습니다.');
     showToast('✗ 서버 통신 오류', 'error');

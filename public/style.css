@@ -390,55 +390,151 @@ body {
 
 /* API 로그 아이템 */
 .api-log-item {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   animation: slideIn 0.3s ease;
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  overflow: hidden;
 }
 
 .log-timestamp {
+  padding: 8px 12px;
+  background: var(--bg-elevated);
   color: var(--text-tertiary);
   font-size: 0.75rem;
-  margin-bottom: 8px;
   display: flex;
   align-items: center;
   gap: 6px;
+  border-bottom: 1px solid var(--border-default);
 }
 
 .log-timestamp::before {
   content: '🕐';
 }
 
-.log-section {
-  background: var(--bg-primary);
-  border: 1px solid var(--border-default);
-  border-radius: 6px;
-  margin-bottom: 8px;
-  overflow: hidden;
-}
-
-.log-section-header {
-  padding: 8px 12px;
+.log-endpoint {
+  padding: 10px 12px;
   background: var(--bg-elevated);
   border-bottom: 1px solid var(--border-default);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  font-size: 0.8rem;
-  font-weight: 600;
+  gap: 8px;
 }
 
 .log-method {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 0.8rem;
 }
 
 .log-method.post {
   color: var(--accent-primary);
 }
 
-.copy-btn {
-  padding: 4px 8px;
+.log-path {
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* 단계별 스타일 */
+.log-step {
+  border-bottom: 1px solid var(--border-default);
+}
+
+.log-step:last-child {
+  border-bottom: none;
+}
+
+.log-step.ai-step {
+  background: var(--bg-secondary);
+  padding: 12px;
+}
+
+.log-step-header {
+  padding: 12px;
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: var(--accent-primary);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.step-title {
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.log-step-body {
+  padding: 12px;
+}
+
+/* 서브 스텝 (AI 프롬프트) */
+.log-substep {
+  margin: 8px;
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  background: var(--bg-primary);
+  overflow: hidden;
+}
+
+.log-substep-header {
+  padding: 8px 12px;
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.substep-icon {
+  font-size: 1rem;
+}
+
+.substep-title {
+  flex: 1;
+  color: var(--text-primary);
+}
+
+.log-substep-body {
+  padding: 10px 12px;
+}
+
+.prompt-text {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.processing-text {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.copy-btn-small {
+  padding: 3px 8px;
   background: transparent;
   border: 1px solid var(--border-default);
   border-radius: 4px;
@@ -448,20 +544,19 @@ body {
   transition: all 0.2s;
 }
 
-.copy-btn:hover {
+.copy-btn-small:hover {
   background: var(--bg-secondary);
   color: var(--text-primary);
   border-color: var(--accent-primary);
 }
 
-.log-section-body {
-  padding: 12px;
-}
 
 .log-code {
   color: var(--text-primary);
   white-space: pre-wrap;
   word-wrap: break-word;
+  font-size: 0.82rem;
+  line-height: 1.5;
 }
 
 .log-code .json-key {

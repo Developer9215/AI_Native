@@ -132,6 +132,9 @@ app.post('/agent', async (req, res) => {
 - setStatus_Remote: 사용자를 재택근무 상태로 변경
 - setStatus_DND: 사용자를 방해금지 상태로 변경
 
+⚠️ 중요: 사용자의 요청이 위 7가지 상태와 관련 없거나, 이해할 수 없는 요청인 경우 반드시 다음과 같이 응답하세요:
+{"tool": "INVALID_REQUEST", "reasoning": "요청을 이해할 수 없거나 지원하지 않는 명령입니다."}
+
 사용자의 자연어 명령을 분석하여 가장 적절한 툴을 선택하세요.
 응답은 반드시 JSON 형식으로 해야 합니다: {"tool": "setStatus_Meeting", "reasoning": "설명"}`
         },
